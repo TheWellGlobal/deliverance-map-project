@@ -21,7 +21,7 @@
     "stateAbbr": "TN",
     "specialty": ["Bloodline Deliverance", "SRA"],
     "email": "admin@thewellglobal.life",
-    "site": "thewellglobal.life",
+    "site": "https://thewellglobal.life",
     "phone": "(123)456-7891"
   },
   {
@@ -34,7 +34,7 @@
     "state":"New York",
     "stateAbbr": "NY",
     "specialty": ["Bloodline Deliverance"],
-    "site": "thewellglobal.life",
+    "site": "https://thewellglobal.life",
     "phone": "(123)456-7891"
   }
 ]

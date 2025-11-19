@@ -7,23 +7,46 @@
   
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <style>
-    body { margin: 0; font-family: sans-serif; }
+    body { 
+        margin: 0; 
+        font-family: Georgia, 'Times New Roman', Times;
+    }
     #map { height: 90vh; }
     .filters {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
       padding: 10px;
-      background: #fff;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      background: #08387a;
+      box-shadow: 0 2px 6px #08387a;
       z-index: 1000;
       position: relative;
     }
-    .filters input, .filters select {
-      padding: 6px 10px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-    }
+    .custom-popup .leaflet-popup-content-wrapper {
+    background-color: #08387a; 
+    font-family: 'Times New Roman', Times, serif;
+    color: #fff;
+    border-radius: 10px;
+    padding: 12px;
+  }
+  .custom-popup .leaflet-popup-tip {
+    background: #1e1e2f;
+    font-family: 'Times New Roman', Times, serif;
+  }
+
+  .filters select, .filters input, .filters button {
+    padding: 6px 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-family: 'Times New Roman', Times, serif;
+    
+  }
+  #cityDropdown:disabled {
+  background-color: #ffffff;
+  color: #000000;             
+  cursor: not-allowed;      
+  opacity: .8;
+}
   </style>
 </head>
 
@@ -32,7 +55,7 @@
     <input id="searchBox" placeholder="Search locations..." />
     <select id="stateDropdown"><option value="">All States</option></select>
     <select id="cityDropdown" disabled><option value="">All Cities</option></select>
-    <select id="specialtyDropdown"><option value="">All Specialties</option></select>
+    <select id="specialtyDropdown"><option value="">All Experiences</option></select>
     <button id="applyFilters">Apply Filters</button>
   </div>
   <div id="map"></div>
@@ -40,9 +63,12 @@
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script>
     const map = L.map('map').setView([39.5, -98.35], 4);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+  attribution: '&copy; OSM &copy; CARTO',
+  subdomains: 'abcd',
+  maxZoom: 19
+}).addTo(map);
+
 
     let allMarkers = [];
     let locations = [];
@@ -64,13 +90,13 @@
             if (loc.phone) {
             popupContent += `<br>${loc.phone}`;
             }
-            if (loc.email) {
-            popupContent += `<br>${loc.email}`;
-            }
+            
             if (loc.site) {
             popupContent += `<br><a href="${loc.site}" target="_blank" rel="noopener noreferrer">Visit Website</a>`;
+            } else if (loc.email) {
+            popupContent += `<br>${loc.email}`;
             }
-            marker.bindPopup(popupContent);
+            marker.bindPopup(popupContent, { className: 'custom-popup' });
           allMarkers.push({ ...loc, marker });
         });
 
@@ -79,9 +105,9 @@
       });
 
     searchBox.addEventListener('keydown', function(event) {
-    if (event.key === 'Enter') { // check if Enter key was pressed
-        event.preventDefault(); // prevent form submission or page reload
-        filterMarkers();        // call the filter function
+    if (event.key === 'Enter') { 
+        event.preventDefault(); 
+        filterMarkers();       
     }
     });
 
