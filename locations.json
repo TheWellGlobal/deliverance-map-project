@@ -6,7 +6,8 @@
     "lng": -83.95934490743693,
     "address": "1413 E Broadway Ave",
     "city": "Maryville",
-    "state": ["Tennessee", "Maryville"],
+    "state": "Tennessee",
+    "stateAbbr": "TN",
     "specialty": ["Bloodline Deliverance", "Freemasonry"]
   },
   {
@@ -15,6 +16,20 @@
     "lat": 35.960,
     "lng": -83.920,
     "address": "456 Elm Ave",
+    "city": "Knoxville",
+    "state":"Tennessee",
+    "stateAbbr": "TN",
     "specialty": ["Bloodline Deliverance", "SRA"]
+  },
+  {
+    "id": 3,
+    "name": "Location 3",
+    "lat": 37.960,
+    "lng": -82.920,
+    "address": "456 Elm Ave",
+    "city": "New York",
+    "state":"New York",
+    "stateAbbr": "NY",
+    "specialty": ["Bloodline Deliverance"]
   }
 ]

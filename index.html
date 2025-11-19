@@ -2,86 +2,143 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>Map Directory</title>
+  <title>Interactive Map Directory</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
+  
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
   <style>
-    body { margin:0; }
-    #map { height: 100vh; }
-    #searchBox {
-      position: absolute;
-      top: 10px; left: 50%;
-      transform: translateX(-50%);
-      z-index: 1000;
-      background: white;
-      padding: 8px 12px;
-      border-radius: 8px;
+    body { margin: 0; font-family: sans-serif; }
+    #map { height: 90vh; }
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 10px;
+      background: #fff;
       box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-      width: 240px;
+      z-index: 1000;
+      position: relative;
+    }
+    .filters input, .filters select {
+      padding: 6px 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
     }
   </style>
 </head>
 
 <body>
-
-    <select id="stateDropdown">
-        <option value="">All States</option>
-    </select>
-
-    <select id="cityDropdown" disabled>
-        <option value="">All Cities</option>
-    </select>
-
-    <select id="specialtyDropdown">
-        <option value="">All Specialties</option>
-    </select>
-
-  <input id="searchBox" placeholder="Search locations..." /> 
-
+  <div class="filters">
+    <input id="searchBox" placeholder="Search locations..." />
+    <select id="stateDropdown"><option value="">All States</option></select>
+    <select id="cityDropdown" disabled><option value="">All Cities</option></select>
+    <select id="specialtyDropdown"><option value="">All Specialties</option></select>
+  </div>
   <div id="map"></div>
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
   <script>
-    let map = L.map('map').setView([39.5, -98.35], 4);
-
+    const map = L.map('map').setView([39.5, -98.35], 4);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
     let allMarkers = [];
-
-    fetch('locations.json')
-      .then(r => r.json())
-      .then(locations => {
-        locations.forEach(loc => {
-          let marker = L.marker([loc.lat, loc.lng]).addTo(map);
-          marker.bindPopup(`<strong>${loc.name}</strong><br>${loc.address || ''}`);
-          allMarkers.push({ ...loc, marker });
-        });
-      });
+    let locations = [];
 
     const searchBox = document.getElementById('searchBox');
-    searchBox.addEventListener('input', () => {
-        let q = searchBox.value.toLowerCase();
+    const stateDropdown = document.getElementById('stateDropdown');
+    const cityDropdown = document.getElementById('cityDropdown');
+    const specialtyDropdown = document.getElementById('specialtyDropdown');
 
-        allMarkers.forEach(item => {
-            let searchableText = [
-            item.name,
-            item.address,
-            item.specialty,
-            item.city,
-            item.state
-            ].join(' ').toLowerCase();
+    // Load locations
+    fetch('locations.json')
+      .then(r => r.json())
+      .then(data => {
+        locations = data;
 
-            if (searchableText.includes(q)) {
-            item.marker.addTo(map);
-            } else {
-            map.removeLayer(item.marker);
-            }
+        // Create markers
+        locations.forEach(loc => {
+          let marker = L.marker([loc.lat, loc.lng]).addTo(map);
+          marker.bindPopup(`<strong>${loc.name}</strong><br>${loc.address || ''}<br>${loc.city}, ${loc.state}`);
+          allMarkers.push({ ...loc, marker });
         });
-        });
+
+        populateFilters();
+        filterMarkers(); // show all markers initially
+      });
+
+    // Populate filters and setup event listeners
+    function populateFilters() {
+      // States
+      const states = [...new Set(locations.map(l => l.state))].sort();
+      states.forEach(s => stateDropdown.appendChild(new Option(s, s)));
+
+      // Specialties
+      const specialties = [...new Set(locations.flatMap(l => l.specialty))].sort();
+      specialties.forEach(spec => specialtyDropdown.appendChild(new Option(spec, spec)));
+
+      // Event listeners
+      stateDropdown.addEventListener('change', () => {
+        populateCities();
+        filterMarkers();
+      });
+      cityDropdown.addEventListener('change', filterMarkers);
+      specialtyDropdown.addEventListener('change', filterMarkers);
+      searchBox.addEventListener('input', filterMarkers);
+    }
+
+    // Populate cities based on selected state
+    function populateCities() {
+      const selectedState = stateDropdown.value;
+      let filteredCities = locations
+        .filter(l => !selectedState || l.state === selectedState)
+        .map(l => l.city);
+      filteredCities = [...new Set(filteredCities)].sort();
+
+      cityDropdown.innerHTML = '<option value="">All Cities</option>';
+      filteredCities.forEach(city => cityDropdown.appendChild(new Option(city, city)));
+      cityDropdown.disabled = filteredCities.length === 0;
+    }
+
+    // Filter markers based on all criteria
+    function filterMarkers() {
+      const searchTerms = searchBox.value.toLowerCase().split(' ').filter(Boolean);
+      const stateVal = stateDropdown.value;
+      const cityVal = cityDropdown.value;
+      const specialtyVal = specialtyDropdown.value;
+
+      let visibleMarkers = [];
+
+      allMarkers.forEach(item => {
+        const specialties = Array.isArray(item.specialty) ? item.specialty : [];
+        const searchableText = [item.name, item.address, specialties.join(' '), item.city, item.state]
+          .join(' ')
+          .toLowerCase();
+
+        const matchesText = searchTerms.every(term => searchableText.includes(term));
+        const matchesState = !stateVal || item.state === stateVal;
+        const matchesCity = !cityVal || item.city === cityVal;
+        const matchesSpecialty = !specialtyVal || specialties.some(cat => cat.toLowerCase() === specialtyVal.toLowerCase());
+
+        if (matchesText && matchesState && matchesCity && matchesSpecialty) {
+          item.marker.addTo(map);
+          visibleMarkers.push(item.marker);
+        } else {
+          map.removeLayer(item.marker);
+        }
+      });
+
+      zoomToFilteredMarkers(visibleMarkers);
+    }
+
+    // Zoom map to visible markers
+    function zoomToFilteredMarkers(markers) {
+      if (markers.length > 0) {
+        const group = L.featureGroup(markers);
+        map.fitBounds(group.getBounds().pad(0.2));
+      }
+    }
   </script>
 </body>
 </html>
