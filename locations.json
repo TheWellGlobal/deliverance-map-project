@@ -48,5 +48,31 @@
     "specialty": ["Bloodline Deliverance"],
     "site": "https://thewellglobal.life",
     "phone": "(123)456-7891"
+    },
+    {
+    "id": 5,
+    "name": "Location 4",
+    "lat": 30.960,
+    "lng": -100.920,
+    "address": "456 Elm Ave",
+    "city": "Flavortown",
+    "state":"Michigan",
+    "stateAbbr": "MI",
+    "specialty": ["Bloodline Deliverance", "New Age", "SRA", "Emotional Healing", "Freemasonry", "Soul Fracture"],
+    "site": "https://thewellglobal.life",
+    "phone": "(123)456-7891"
+    },
+    {
+    "id": 6,
+    "name": "Location 6",
+    "lat": 37.960,
+    "lng": -90.920,
+    "address": "456 Elm Ave",
+    "city": "Flavortown",
+    "state":"Michigan",
+    "stateAbbr": "MI",
+    "specialty": ["Soul Fracture", "Emotional Healing"],
+    "site": "https://thewellglobal.life",
+    "phone": "(123)456-7891"
     }
 ]
