@@ -1,0 +1,16 @@
+[
+  {
+    "id": 1,
+    "name": "The Well",
+    "lat": 36.027,
+    "lng": -83.869,
+    "address": "123 Main St"
+  },
+  {
+    "id": 2,
+    "name": "TWOM",
+    "lat": 35.960,
+    "lng": -83.920,
+    "address": "456 Elm Ave"
+  }
+]
