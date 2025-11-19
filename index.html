@@ -47,6 +47,69 @@
   cursor: not-allowed;      
   opacity: .8;
 }
+#markerModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.7);
+  z-index: 2000; /* higher than map & filters */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#modalContent {
+  background-color: #08387a;
+  color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  width: 50%;          
+  height: 50%;          
+  max-height: 90%;
+  overflow-y: auto;
+  position: relative;
+  font-family: 'Times New Roman', Times, serif;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  text-align: center;
+}
+
+#closeModal {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: transparent;
+  color: #fff;
+  font-size: 24px;
+  border: none;
+  cursor: pointer;
+}
+.tag-container {
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tag {
+  padding: 5px 10px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: bold;
+  color: white;
+  display: inline-block;
+}
+
+/* Optional color palette — add more if you want */
+.tag-color-0 { background-color: #ff6b6b; }
+.tag-color-1 { background-color: #6bcfff; }
+.tag-color-2 { background-color: #6bff95; }
+.tag-color-3 { background-color: #ffc36b; }
+.tag-color-4 { background-color: #c36bff; }
+.tag-color-5 { background-color: #ff6bd7; }
   </style>
 </head>
 
@@ -57,6 +120,7 @@
     <select id="cityDropdown" disabled><option value="">All Cities</option></select>
     <select id="specialtyDropdown"><option value="">All Experiences</option></select>
     <button id="applyFilters">Apply Filters</button>
+    <button id="clearFilters">Clear Filters</button>
   </div>
   <div id="map"></div>
 
@@ -77,6 +141,7 @@
     const stateDropdown = document.getElementById('stateDropdown');
     const cityDropdown = document.getElementById('cityDropdown');
     const specialtyDropdown = document.getElementById('specialtyDropdown');
+    
 
     fetch('locations.json')
       .then(r => r.json())
@@ -96,8 +161,26 @@
             } else if (loc.email) {
             popupContent += `<br>${loc.email}`;
             }
-            marker.bindPopup(popupContent, { className: 'custom-popup' });
+            let modal = document.getElementById('markerModal');
+            let modalBody = document.getElementById('modalBody');
+            let closeModal = document.getElementById('closeModal');
+
+            allMarkers.push({ ...loc, marker }); // after marker creation
+
+            marker.on('click', () => {
+            let content = `<h2>${loc.name}</h2>
+                            <p>${loc.address || ''}<br>${loc.city}, ${loc.state}</p>`;
+            if (loc.phone) content += `<p>${loc.phone}</p>`;
+            if (loc.site) content += `<p><a href="${loc.site}" target="_blank" rel="noopener noreferrer" style="color:#fff; text-decoration:underline;">Visit Website</a></p>`;
+            else if (loc.email) content += `<p>${loc.email}</p>`;
+
+            modalBody.innerHTML = content;
+            modal.style.display = 'flex';
+            });
           allMarkers.push({ ...loc, marker });
+          closeModal.addEventListener('click', () => {
+  modal.style.display = 'none';
+});
         });
 
         populateFilters();
@@ -127,15 +210,17 @@
     }
 
     function populateCities() {
-      const selectedState = stateDropdown.value;
-      let filteredCities = locations
+    const selectedState = stateDropdown.value;
+    let filteredCities = locations
         .filter(l => !selectedState || l.state === selectedState)
         .map(l => l.city);
-      filteredCities = [...new Set(filteredCities)].sort();
+    filteredCities = [...new Set(filteredCities)].sort();
 
-      cityDropdown.innerHTML = '<option value="">All Cities</option>';
-      filteredCities.forEach(city => cityDropdown.appendChild(new Option(city, city)));
-      cityDropdown.disabled = filteredCities.length === 0;
+    cityDropdown.innerHTML = '<option value="">All Cities</option>';
+    filteredCities.forEach(city => cityDropdown.appendChild(new Option(city, city)));
+
+    // Enable city dropdown only if a state is selected AND there are cities
+    cityDropdown.disabled = !selectedState || filteredCities.length === 0;
     }
 
     function filterMarkers() {
@@ -175,6 +260,27 @@
         map.fitBounds(group.getBounds().pad(0.2));
       }
     }
+    const clearButton = document.getElementById('clearFilters');
+
+    clearButton.addEventListener('click', () => {
+    searchBox.value = '';
+    stateDropdown.value = '';
+    cityDropdown.value = '';
+    cityDropdown.disabled = true; // disable city dropdown until state is selected
+    specialtyDropdown.value = '';
+
+    populateCities(); // repopulate cities based on no state selection
+
+    // Show all markers
+    allMarkers.forEach(item => item.marker.addTo(map));
+    filterMarkers(); // optional: ensures zoom resets correctly
+    });
   </script>
+  <div id="markerModal" style="display:none;">
+  <div id="modalContent">
+    <button id="closeModal">&times;</button>
+    <div id="modalBody"></div>
+  </div>
+</div>
 </body>
 </html>

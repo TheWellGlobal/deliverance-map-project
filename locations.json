@@ -33,8 +33,20 @@
     "city": "New York",
     "state":"New York",
     "stateAbbr": "NY",
+    "site": "https://thewellglobal.life",
+    "phone": "(123)456-7891"
+  },
+    {
+    "id": 4,
+    "name": "Location 3",
+    "lat": 35.960,
+    "lng": -80.920,
+    "address": "456 Elm Ave",
+    "city": "Flavortown",
+    "state":"Michigan",
+    "stateAbbr": "MI",
     "specialty": ["Bloodline Deliverance"],
     "site": "https://thewellglobal.life",
     "phone": "(123)456-7891"
-  }
+    }
 ]
