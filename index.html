@@ -168,15 +168,36 @@
             allMarkers.push({ ...loc, marker }); // after marker creation
 
             marker.on('click', () => {
-            let content = `<h2>${loc.name}</h2>
-                            <p>${loc.address || ''}<br>${loc.city}, ${loc.state}</p>`;
-            if (loc.phone) content += `<p>${loc.phone}</p>`;
-            if (loc.site) content += `<p><a href="${loc.site}" target="_blank" rel="noopener noreferrer" style="color:#fff; text-decoration:underline;">Visit Website</a></p>`;
-            else if (loc.email) content += `<p>${loc.email}</p>`;
+                let content = `
+                    <h2>${loc.name}</h2>
+                    <p>${loc.address || ''}<br>${loc.city}, ${loc.state}</p>
+                `;
 
-            modalBody.innerHTML = content;
-            modal.style.display = 'flex';
-            });
+                if (loc.phone) {
+                    content += `<p>${loc.phone}</p>`;
+                }
+
+                if (loc.site) {
+                    content += `<p><a href="${loc.site}" target="_blank" rel="noopener noreferrer" style="color:#fff; text-decoration:underline;">Visit Website</a></p>`;
+                } else if (loc.email) {
+                    content += `<p>${loc.email}</p>`;
+                }
+
+                // ---- TAGS GO HERE ----
+                if (Array.isArray(loc.specialty) && loc.specialty.length > 0) {
+                    content += `<div class="tag-container">`;
+
+                    loc.specialty.forEach((tag, i) => {
+                    const colorIndex = i % 6; // rotates through 6 color classes
+                    content += `<span class="tag tag-color-${colorIndex}">${tag}</span>`;
+                    });
+
+                    content += `</div>`;
+                }
+
+                modalBody.innerHTML = content;
+                modal.style.display = 'flex';
+                });
           allMarkers.push({ ...loc, marker });
           closeModal.addEventListener('click', () => {
   modal.style.display = 'none';
