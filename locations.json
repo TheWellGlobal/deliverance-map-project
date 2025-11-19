@@ -2,15 +2,19 @@
   {
     "id": 1,
     "name": "The Well",
-    "lat": 36.027,
-    "lng": -83.869,
-    "address": "123 Main St"
+    "lat": 35.76901886878039,
+    "lng": -83.95934490743693,
+    "address": "1413 E Broadway Ave",
+    "city": "Maryville",
+    "state": ["Tennessee", "Maryville"],
+    "specialty": ["Bloodline Deliverance", "Freemasonry"]
   },
   {
     "id": 2,
-    "name": "TWOM",
+    "name": "Location 2",
     "lat": 35.960,
     "lng": -83.920,
-    "address": "456 Elm Ave"
+    "address": "456 Elm Ave",
+    "specialty": ["Bloodline Deliverance", "SRA"]
   }
 ]

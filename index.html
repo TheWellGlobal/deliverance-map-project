@@ -24,6 +24,19 @@
 </head>
 
 <body>
+
+    <select id="stateDropdown">
+        <option value="">All States</option>
+    </select>
+
+    <select id="cityDropdown" disabled>
+        <option value="">All Cities</option>
+    </select>
+
+    <select id="specialtyDropdown">
+        <option value="">All Specialties</option>
+    </select>
+
   <input id="searchBox" placeholder="Search locations..." /> 
 
   <div id="map"></div>
@@ -51,16 +64,24 @@
 
     const searchBox = document.getElementById('searchBox');
     searchBox.addEventListener('input', () => {
-      let q = searchBox.value.toLowerCase();
+        let q = searchBox.value.toLowerCase();
 
-      allMarkers.forEach(item => {
-        if (item.name.toLowerCase().includes(q)) {
-          item.marker.addTo(map);
-        } else {
-          map.removeLayer(item.marker);
-        }
-      });
-    });
+        allMarkers.forEach(item => {
+            let searchableText = [
+            item.name,
+            item.address,
+            item.specialty,
+            item.city,
+            item.state
+            ].join(' ').toLowerCase();
+
+            if (searchableText.includes(q)) {
+            item.marker.addTo(map);
+            } else {
+            map.removeLayer(item.marker);
+            }
+        });
+        });
   </script>
 </body>
 </html>
