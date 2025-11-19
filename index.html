@@ -33,6 +33,7 @@
     <select id="stateDropdown"><option value="">All States</option></select>
     <select id="cityDropdown" disabled><option value="">All Cities</option></select>
     <select id="specialtyDropdown"><option value="">All Specialties</option></select>
+    <button id="applyFilters">Apply Filters</button>
   </div>
   <div id="map"></div>
 
@@ -51,44 +52,54 @@
     const cityDropdown = document.getElementById('cityDropdown');
     const specialtyDropdown = document.getElementById('specialtyDropdown');
 
-    // Load locations
     fetch('locations.json')
       .then(r => r.json())
       .then(data => {
         locations = data;
 
-        // Create markers
+        //markers
         locations.forEach(loc => {
           let marker = L.marker([loc.lat, loc.lng]).addTo(map);
-          marker.bindPopup(`<strong>${loc.name}</strong><br>${loc.address || ''}<br>${loc.city}, ${loc.state}`);
+          let popupContent = `<strong>${loc.name}</strong><br>${loc.address || ''}<br>${loc.city}, ${loc.state}`;
+            if (loc.phone) {
+            popupContent += `<br>${loc.phone}`;
+            }
+            if (loc.email) {
+            popupContent += `<br>${loc.email}`;
+            }
+            if (loc.site) {
+            popupContent += `<br><a href="${loc.site}" target="_blank" rel="noopener noreferrer">Visit Website</a>`;
+            }
+            marker.bindPopup(popupContent);
           allMarkers.push({ ...loc, marker });
         });
 
         populateFilters();
-        filterMarkers(); // show all markers initially
+        filterMarkers(); //TODO: clustering
       });
 
-    // Populate filters and setup event listeners
+    searchBox.addEventListener('keydown', function(event) {
+    if (event.key === 'Enter') { // check if Enter key was pressed
+        event.preventDefault(); // prevent form submission or page reload
+        filterMarkers();        // call the filter function
+    }
+    });
+
+    const applyButton = document.getElementById('applyFilters');
     function populateFilters() {
-      // States
       const states = [...new Set(locations.map(l => l.state))].sort();
       states.forEach(s => stateDropdown.appendChild(new Option(s, s)));
 
-      // Specialties
       const specialties = [...new Set(locations.flatMap(l => l.specialty))].sort();
       specialties.forEach(spec => specialtyDropdown.appendChild(new Option(spec, spec)));
 
-      // Event listeners
-      stateDropdown.addEventListener('change', () => {
-        populateCities();
-        filterMarkers();
-      });
-      cityDropdown.addEventListener('change', filterMarkers);
-      specialtyDropdown.addEventListener('change', filterMarkers);
-      searchBox.addEventListener('input', filterMarkers);
+      stateDropdown.addEventListener('change', populateCities); 
+      //*cityDropdown.addEventListener('change', filterMarkers);
+      //specialtyDropdown.addEventListener('change', filterMarkers);
+      //searchBox.addEventListener('input', filterMarkers);
+      applyButton.addEventListener('click', filterMarkers);
     }
 
-    // Populate cities based on selected state
     function populateCities() {
       const selectedState = stateDropdown.value;
       let filteredCities = locations
@@ -101,7 +112,6 @@
       cityDropdown.disabled = filteredCities.length === 0;
     }
 
-    // Filter markers based on all criteria
     function filterMarkers() {
       const searchTerms = searchBox.value.toLowerCase().split(' ').filter(Boolean);
       const stateVal = stateDropdown.value;
@@ -112,7 +122,7 @@
 
       allMarkers.forEach(item => {
         const specialties = Array.isArray(item.specialty) ? item.specialty : [];
-        const searchableText = [item.name, item.address, specialties.join(' '), item.city, item.state]
+        const searchableText = [item.name, item.address, specialties.join(' '), item.city, item.state, item.stateAbbr]
           .join(' ')
           .toLowerCase();
 

@@ -19,7 +19,10 @@
     "city": "Knoxville",
     "state":"Tennessee",
     "stateAbbr": "TN",
-    "specialty": ["Bloodline Deliverance", "SRA"]
+    "specialty": ["Bloodline Deliverance", "SRA"],
+    "email": "admin@thewellglobal.life",
+    "site": "thewellglobal.life",
+    "phone": "(123)456-7891"
   },
   {
     "id": 3,
@@ -30,6 +33,8 @@
     "city": "New York",
     "state":"New York",
     "stateAbbr": "NY",
-    "specialty": ["Bloodline Deliverance"]
+    "specialty": ["Bloodline Deliverance"],
+    "site": "thewellglobal.life",
+    "phone": "(123)456-7891"
   }
 ]
