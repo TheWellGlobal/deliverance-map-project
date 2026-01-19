@@ -22,6 +22,11 @@
       z-index: 1000;
       position: relative;
     }
+    h2 br.name-subline + * {
+      font-size: 0.75em;
+      font-weight: 400;
+      opacity: 0.8;
+    }
     .custom-popup .leaflet-popup-content-wrapper {
       background-color: #08387a; 
       font-family: 'Times New Roman', Times, serif;
@@ -126,7 +131,7 @@
     <input id="searchBox" placeholder="Search locations..." />
     <select id="stateDropdown"><option value="">All States</option></select>
     <select id="cityDropdown" disabled><option value="">All Cities</option></select>
-    <select id="specialtyDropdown"><option value="">All Experiences</option></select>
+    <select id="specialtyDropdown"><option value="">Experience in...</option></select>
     <button id="applyFilters">Apply Filters</button>
     <button id="clearFilters">Clear Filters</button>
   </div>
@@ -136,9 +141,7 @@
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script>
 
-    // -------------------------------------------------
-    // ADDED: Specialty → Color map
-    // -------------------------------------------------
+
     const specialtyColorMap = {
       "Bloodline Deliverance": "#03045E",
       "New Age": "#023E8A",
@@ -147,6 +150,12 @@
       "Soul Fracture": "#00B4D8",
       "Emotional Healing": "#90E0EF"
     };
+
+    document.addEventListener("DOMContentLoaded", () => {
+      renderStateOptions();
+      renderSpecialtyOptions();
+      renderExperienceOptions();
+    });
 
     function luminance(hex) {
       hex = hex.replace('#','');
@@ -192,10 +201,16 @@
           let closeModal = document.getElementById('closeModal');
 
           marker.on('click', () => {
+              const description = loc.description
+                ? loc.description.replace(/\\n|\n/g, '<br class="subline">')
+                : "";
             let content = `
-              <h2>${loc.name}</h2>
+              <h2>${loc.name.replace(/\\n|\n/g, '<br class="name-subline">')}</h2>
               <p>${loc.address || ''}<br>${loc.city}, ${loc.state}</p>
             `;
+            if (description) {
+              content += `<p>${description}</p>`;
+            }
 
             if (loc.phone) content += `<p>${loc.phone}</p>`;
             if (loc.site) {
@@ -224,7 +239,12 @@
           });
         });
 
-        populateFilters();
+        renderStateOptions();
+        renderSpecialtyOptions();
+
+        stateDropdown.addEventListener('change', populateCities);
+        applyButton.addEventListener('click', filterMarkers);
+
         filterMarkers();
       });
 
@@ -236,6 +256,18 @@
     });
 
     const applyButton = document.getElementById('applyFilters');
+
+    function renderStateOptions() {
+      const states = [...new Set(locations.map(l => l.state))].sort();
+      stateDropdown.innerHTML = `<option value="">All States</option>`;
+      states.forEach(s => stateDropdown.appendChild(new Option(s, s)));
+    }
+
+    function renderSpecialtyOptions() {
+      const specialties = [...new Set(locations.flatMap(l => l.specialty || []))].sort();
+      specialtyDropdown.innerHTML = `<option value="">Experience in...</option>`;
+      specialties.forEach(spec => specialtyDropdown.appendChild(new Option(spec, spec)));
+    }
 
     function populateFilters() {
       const states = [...new Set(locations.map(l => l.state))].sort();
@@ -256,16 +288,21 @@
 
     function populateCities() {
       const selectedState = stateDropdown.value;
-      let filteredCities = locations
-        .filter(l => !selectedState || l.state === selectedState)
-        .map(l => l.city);
 
-      filteredCities = [...new Set(filteredCities)].sort();
+      if (!selectedState) {
+        cityDropdown.innerHTML = `<option value="">All Cities</option>`;
+        cityDropdown.disabled = true;
+        return;
+      }
 
-      cityDropdown.innerHTML = '<option value="">All Cities</option>';
-      filteredCities.forEach(city => cityDropdown.appendChild(new Option(city, city)));
+      const cities = [...new Set(
+        locations.filter(l => l.state === selectedState).map(l => l.city)
+      )].sort();
 
-      cityDropdown.disabled = !selectedState || filteredCities.length === 0;
+      cityDropdown.innerHTML = `<option value="">All Cities</option>`;
+      cities.forEach(city => cityDropdown.appendChild(new Option(city, city)));
+
+      cityDropdown.disabled = false;
     }
 
     function filterMarkers() {
@@ -312,19 +349,20 @@
 
     const clearButton = document.getElementById('clearFilters');
     clearButton.addEventListener('click', () => {
-      searchBox.value = '';
-      stateDropdown.value = '';
-      cityDropdown.value = '';
-      cityDropdown.disabled = true;
-      specialtyDropdown.value = '';
+    searchBox.value = '';
+    stateDropdown.value = '';
+    cityDropdown.value = '';
+    specialtyDropdown.value = '';
 
-      populateCities();
-      map.setView([39.5, -98.35], 4);
+    cityDropdown.innerHTML = `<option value="">All Cities</option>`;
+    cityDropdown.disabled = true;
 
-      allMarkers.forEach(item => item.marker.addTo(map));
-      filterMarkers();
-      populateFilters();
-    });
+    map.setView([39.5, -98.35], 4);
+
+    allMarkers.forEach(item => item.marker.addTo(map));
+    filterMarkers();
+  });
+
 
   </script>
 
