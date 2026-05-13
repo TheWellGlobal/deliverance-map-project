@@ -51,15 +51,49 @@
     },
     {
     "id": 5,
-    "name": "Kirk & Kris Bossert\nIn-Person at Dayspring Churc/Virtual",
+    "name": "Kirk & Kris Bossert\nIn-Person at Dayspring Church/Virtual",
     "lat": 37.23637182398045,
     "lng": -93.27332998963688,
     "address": "2157 North Prospect",
     "city": "Springfield",
     "state":"Missouri",
     "stateAbbr": "MO",
-    "specialty": ["Bloodline Deliverance", "Freemasonry", "Occult Practices", "New Age Practices","Drug Addiction", "Soul Fractures", "Islam/African Religions"],
+    "specialty": ["Bloodline Deliverance", "Freemasonry", "Occult Practices", "New Age Practices","Drug Addiction", "Soul Fractures", "Islam/African Religions"
+    ],
     "phone": "417-839-4957", 
     "email": "bossertk2@gmail.com"
-    }
+    },
+  {
+    "id": 6,
+    "name": "Adrienne Roberts\nIn-Person/Virtual",
+    "lat": 43.414457,
+    "lng": -85.753383,
+    "city": "Newaygo",
+    "state":"Michigan",
+    "stateAbbr": "MI",
+    "specialty": ["Bloodline Deliverance", "Freemasonry", "Occult Practices", "New Age Practices","Drug Addiction", "Soul Fractures", "Psychedelic Drugs"],
+    "email": "justaskadrienne@gmail.com"
+    },
+  {
+    "id": 7,
+    "name": "Josh & Jennifer Pettit\nIn-Person/Virtual",
+    "lat": 43.414457,
+    "lng": -85.753383,
+    "city": "Newaygo",
+    "state":"Michigan",
+    "stateAbbr": "MI",
+    "specialty": ["Bloodline Deliverance", "Freemasonry", "Occult Practices", "New Age Practices","Drug Addiction", "Soul Fractures", "Satanism", "Extreme Mental Disorders"],
+    "email": "jen.pettit@thewellglobal.life"
+  },
+  {
+  "id": 8,
+    "name": "Erich Rose\nIn-Person/Virtual",
+    "lat": 33.191576,
+    "lng": -116.757517,
+    "city": "San Diego County",
+    "state":"California",
+    "stateAbbr": "CA",
+    "specialty": ["Bloodline Deliverance", "Occult Practices", "New Age Practices","Drug Addiction", "Soul Fractures"],
+    "site": "https://Adullaminternational.org",
+  }
 ]
